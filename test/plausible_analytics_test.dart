@@ -29,6 +29,7 @@ void main() {
         name: 'conversion', page: 'homescreen', referrer: 'referrerPage');
     expect(await event, 202);
   });
+
   test('check disabled call', () async {
     final plausible = Plausible(serverUrl, domain, screenWidth: screenWidth);
     plausible.enabled = false;
@@ -39,5 +40,17 @@ void main() {
     final event = plausible.event(
         name: 'conversion', page: 'homescreen', referrer: 'referrerPage');
     expect(await event, 0);
+  });
+
+  test('check failed http request', () async {
+    final plausible =
+        Plausible("somewrongurl.asd21", domain, screenWidth: screenWidth);
+    expect(plausible.serverUrl, "somewrongurl.asd21");
+    expect(plausible.domain, domain);
+    expect(plausible.screenWidth, screenWidth);
+
+    final event = plausible.event(
+        name: 'conversion', page: 'homescreen', referrer: 'referrerPage');
+    expect(await event, 1);
   });
 }

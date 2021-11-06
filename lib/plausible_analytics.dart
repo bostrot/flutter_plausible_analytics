@@ -41,23 +41,28 @@ class Plausible {
     }
 
     // Http Post request see https://plausible.io/docs/events-api
-    HttpClient client = HttpClient();
-    HttpClientRequest request =
-        await client.postUrl(Uri.parse(serverUrl + '/api/event'));
-    request.headers.set('User-Agent', userAgent);
-    request.headers.set('Content-Type', 'application/json');
-    request.headers.set('X-Forwarded-For', '127.0.0.1');
-    Object body = {
-      "domain": domain,
-      "name": name,
-      "url": page,
-      "referrer": referrer,
-      "screen_width": screenWidth
-    };
-    request.write(json.encode(body));
-    final HttpClientResponse response = await request.close();
-    client.close();
+    try {
+      HttpClient client = HttpClient();
+      HttpClientRequest request =
+          await client.postUrl(Uri.parse(serverUrl + '/api/event'));
+      request.headers.set('User-Agent', userAgent);
+      request.headers.set('Content-Type', 'application/json');
+      request.headers.set('X-Forwarded-For', '127.0.0.1');
+      Object body = {
+        "domain": domain,
+        "name": name,
+        "url": page,
+        "referrer": referrer,
+        "screen_width": screenWidth
+      };
+      request.write(json.encode(body));
+      final HttpClientResponse response = await request.close();
+      client.close();
+      return response.statusCode;
+    } catch (e) {
+      print(e);
+    }
 
-    return response.statusCode;
+    return 1;
   }
 }
