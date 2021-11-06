@@ -2,12 +2,6 @@ library plausible_analytics;
 
 import 'dart:io';
 import 'dart:convert';
-import 'package:device_info_plus/device_info_plus.dart';
-
-/// Default user agent
-const String defaultUserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS "
-    "X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183."
-    "121 Safari/537.36 OPR/71.0.3770.284";
 
 /// Plausible class. Use the constructor to set the parameters.
 class Plausible {
@@ -17,10 +11,11 @@ class Plausible {
   String domain;
   String url;
   String screenWidth;
+  String appName;
 
   /// Constructor
   Plausible(this.serverUrl, this.domain, this.url,
-      {this.userAgent = defaultUserAgent, this.screenWidth = ""});
+      {this.userAgent = "", this.screenWidth = "", this.appName = "app"});
 
   /// Post event to plausible
   Future<int> event(
@@ -37,17 +32,10 @@ class Plausible {
     referrer = "app://localhost/" + referrer;
 
     // Get and set device infos
-    /*DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-    try {
-      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-      IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-      WebBrowserInfo webBrowserInfo = await deviceInfo.webBrowserInfo;
-      WindowsDeviceInfo windowsInfo = await deviceInfo.windowsInfo;
-      MacOsDeviceInfo macOsInfo = await deviceInfo.macOsInfo;
-      LinuxDeviceInfo linuxInfo = await deviceInfo.linuxInfo;
-    } catch (e) {
-      print(e);
-    }*/
+    String version = Platform.operatingSystemVersion.replaceAll('"', '');
+    if (userAgent == "") {
+      userAgent = "Mozilla/5.0 ($version; rv:53.0) Gecko/20100101 Chrome/53.0";
+    }
 
     // Http Post request see https://plausible.io/docs/events-api
     HttpClient client = HttpClient();
