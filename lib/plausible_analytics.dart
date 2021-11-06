@@ -25,7 +25,7 @@ class Plausible {
     int lastCharIndex = serverUrl.length - 1;
     if (serverUrl.toString()[lastCharIndex] == '/') {
       // Remove trailing slash '/'
-      serverUrl = serverUrl.substring(0, lastCharIndex - 1);
+      serverUrl = serverUrl.substring(0, lastCharIndex);
     }
     page = "app://localhost/" + page;
     referrer = "app://localhost/" + referrer;
