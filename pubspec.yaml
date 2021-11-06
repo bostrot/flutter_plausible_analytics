@@ -1,6 +1,6 @@
 name: plausible_analytics
 description: A Flutter plugin for Plausible Analytics.
-version: 0.1.0
+version: 0.1.1
 homepage: https://github.com/bostrot/flutter_plausible_analytics.git
 issue_tracker: https://github.com/bostrot/flutter_plausible_analytics/issues
 

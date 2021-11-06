@@ -10,17 +10,21 @@ class Plausible {
   String userAgent;
   String domain;
   String screenWidth;
-  String appName;
+  bool enabled = true;
 
   /// Constructor
   Plausible(this.serverUrl, this.domain,
-      {this.userAgent = "", this.screenWidth = "", this.appName = "app"});
+      {this.userAgent = "", this.screenWidth = ""});
 
   /// Post event to plausible
   Future<int> event(
       {String name = "pageview",
       String referrer = "",
       String page = "main"}) async {
+    if (!enabled) {
+      return 0;
+    }
+
     // Post-edit parameters
     int lastCharIndex = serverUrl.length - 1;
     if (serverUrl.toString()[lastCharIndex] == '/') {

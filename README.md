@@ -60,5 +60,11 @@ final event = plausible.event(
         referrer: 'referrerPage');
 ```
 
+Disable analytics (might be useful if a user opts out):
+
+```dart
+plausible.enabled = false;
+```
+
 You can also use a custom user agent but that is not recommended as
 the default one already puts in the current Operation System & Version.

@@ -29,4 +29,15 @@ void main() {
         name: 'conversion', page: 'homescreen', referrer: 'referrerPage');
     expect(await event, 202);
   });
+  test('check disabled call', () async {
+    final plausible = Plausible(serverUrl, domain, screenWidth: screenWidth);
+    plausible.enabled = false;
+    expect(plausible.serverUrl, serverUrl);
+    expect(plausible.domain, domain);
+    expect(plausible.screenWidth, screenWidth);
+
+    final event = plausible.event(
+        name: 'conversion', page: 'homescreen', referrer: 'referrerPage');
+    expect(await event, 0);
+  });
 }
