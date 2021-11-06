@@ -9,12 +9,11 @@ class Plausible {
   String serverUrl;
   String userAgent;
   String domain;
-  String url;
   String screenWidth;
   String appName;
 
   /// Constructor
-  Plausible(this.serverUrl, this.domain, this.url,
+  Plausible(this.serverUrl, this.domain,
       {this.userAgent = "", this.screenWidth = "", this.appName = "app"});
 
   /// Post event to plausible
