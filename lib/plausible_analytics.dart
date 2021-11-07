@@ -2,6 +2,7 @@ library plausible_analytics;
 
 import 'dart:io';
 import 'dart:convert';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 /// Plausible class. Use the constructor to set the parameters.
 class Plausible {
@@ -35,7 +36,14 @@ class Plausible {
     referrer = "app://localhost/" + referrer;
 
     // Get and set device infos
-    String version = Platform.operatingSystemVersion.replaceAll('"', '');
+    String version = "";
+
+    if (kIsWeb) {
+      version = "Windows";
+    } else {
+      version = Platform.operatingSystemVersion.replaceAll('"', '');
+    }
+
     if (userAgent == "") {
       userAgent = "Mozilla/5.0 ($version; rv:53.0) Gecko/20100101 Chrome/53.0";
     }
