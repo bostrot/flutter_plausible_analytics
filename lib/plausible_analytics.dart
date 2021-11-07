@@ -68,6 +68,7 @@ class Plausible {
       client.close();
       return response.statusCode;
     } catch (e) {
+      // ignore: avoid_print
       print(e);
     }
 
