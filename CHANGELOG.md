@@ -1,3 +1,7 @@
+## 0.1.3
+
+* Added web check
+
 ## 0.1.2
 
 * Added error handling for http request.
