@@ -21,7 +21,8 @@ class Plausible {
   Future<int> event(
       {String name = "pageview",
       String referrer = "",
-      String page = "main"}) async {
+      String page = "main",
+      Map<String, String> props = const {}}) async {
     if (!enabled) {
       return 0;
     }
@@ -61,7 +62,8 @@ class Plausible {
         "name": name,
         "url": page,
         "referrer": referrer,
-        "screen_width": screenWidth
+        "screen_width": screenWidth,
+        "props": props,
       };
       request.write(json.encode(body));
       final HttpClientResponse response = await request.close();
