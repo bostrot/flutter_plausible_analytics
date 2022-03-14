@@ -21,7 +21,7 @@ class Plausible {
   Future<int> event(
       {String name = "pageview",
       String referrer = "",
-      String page = "main",
+      String page = "",
       Map<String, String> props = const {}}) async {
     if (!enabled) {
       return 0;
