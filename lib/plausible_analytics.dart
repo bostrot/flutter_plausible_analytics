@@ -4,10 +4,6 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
-
-import 'dart:developer';
-
-
 /// Plausible class. Use the constructor to set the parameters.
 class Plausible {
   /// The url of your plausible server e.g. https://plausible.io
@@ -22,10 +18,11 @@ class Plausible {
       {this.userAgent = "", this.screenWidth = ""});
 
   /// Post event to plausible
-  Future<int> event({String name = "pageview",
-    String referrer = "",
-    String page = "",
-    Map<String, String> props = const {}}) async {
+  Future<int> event(
+      {String name = "pageview",
+        String referrer = "",
+        String page = "",
+        Map<String, String> props = const {}}) async {
     if (!enabled) {
       return 0;
     }
@@ -60,11 +57,6 @@ class Plausible {
       request.headers.set('User-Agent', userAgent);
       request.headers.set('Content-Type', 'application/json; charset=utf-8');
       request.headers.set('X-Forwarded-For', '127.0.0.1');
-
-      props.keys.forEach((element) {
-        props[element] = convertToUnicode(value: props[element]);
-      });
-
       Object body = {
         "domain": domain,
         "name": name,
@@ -73,9 +65,7 @@ class Plausible {
         "screen_width": screenWidth,
         "props": props,
       };
-
-      request.write(json.encode(body).replaceAll("\\\\", "\\"));
-
+      request.write(json.encode(body));
       final HttpClientResponse response = await request.close();
       client.close();
       return response.statusCode;
@@ -85,18 +75,5 @@ class Plausible {
     }
 
     return 1;
-  }
-
-  String convertToUnicode({String value}) {
-    var result = "";
-    value.runes.forEach((element) {
-      var char = element.toRadixString(16);
-      if (char.length < 4) {
-        result += "\\" + "u00$char";
-      } else {
-        result += "\\" + "u$char";
-      }
-    });
-    return result;
   }
 }
