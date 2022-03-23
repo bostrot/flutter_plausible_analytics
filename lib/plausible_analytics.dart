@@ -20,8 +20,9 @@ class Plausible {
   /// Post event to plausible
   Future<int> event(
       {String name = "pageview",
-      String referrer = "",
-      String page = "main"}) async {
+        String referrer = "",
+        String page = "",
+        Map<String, String> props = const {}}) async {
     if (!enabled) {
       return 0;
     }
@@ -52,16 +53,17 @@ class Plausible {
     try {
       HttpClient client = HttpClient();
       HttpClientRequest request =
-          await client.postUrl(Uri.parse(serverUrl + '/api/event'));
+      await client.postUrl(Uri.parse(serverUrl + '/api/event'));
       request.headers.set('User-Agent', userAgent);
-      request.headers.set('Content-Type', 'application/json');
+      request.headers.set('Content-Type', 'application/json; charset=utf-8');
       request.headers.set('X-Forwarded-For', '127.0.0.1');
       Object body = {
         "domain": domain,
         "name": name,
         "url": page,
         "referrer": referrer,
-        "screen_width": screenWidth
+        "screen_width": screenWidth,
+        "props": props,
       };
       request.write(json.encode(body));
       final HttpClientResponse response = await request.close();
