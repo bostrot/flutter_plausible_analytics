@@ -15,4 +15,7 @@ void main() {
 
   // Page open event
   plausible.event(name: "settings_page");
+
+  // Click event
+  plausible.event();
 }
