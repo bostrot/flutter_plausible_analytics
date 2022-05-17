@@ -1,8 +1,7 @@
 library plausible_analytics;
 
-import 'dart:io';
+import 'package:universal_io/io.dart'; // instead of 'dart:io';
 import 'dart:convert';
-import 'package:flutter/foundation.dart' show kIsWeb;
 
 /// Plausible class. Use the constructor to set the parameters.
 class Plausible {
@@ -20,9 +19,9 @@ class Plausible {
   /// Post event to plausible
   Future<int> event(
       {String name = "pageview",
-        String referrer = "",
-        String page = "",
-        Map<String, String> props = const {}}) async {
+      String referrer = "",
+      String page = "",
+      Map<String, String> props = const {}}) async {
     if (!enabled) {
       return 0;
     }
@@ -37,13 +36,7 @@ class Plausible {
     referrer = "app://localhost/" + referrer;
 
     // Get and set device infos
-    String version = "";
-
-    if (kIsWeb) {
-      version = "Windows";
-    } else {
-      version = Platform.operatingSystemVersion.replaceAll('"', '');
-    }
+    String version = Platform.operatingSystemVersion.replaceAll('"', '');
 
     if (userAgent == "") {
       userAgent = "Mozilla/5.0 ($version; rv:53.0) Gecko/20100101 Chrome/53.0";
@@ -53,7 +46,7 @@ class Plausible {
     try {
       HttpClient client = HttpClient();
       HttpClientRequest request =
-      await client.postUrl(Uri.parse(serverUrl + '/api/event'));
+          await client.postUrl(Uri.parse(serverUrl + '/api/event'));
       request.headers.set('User-Agent', userAgent);
       request.headers.set('Content-Type', 'application/json; charset=utf-8');
       request.headers.set('X-Forwarded-For', '127.0.0.1');
