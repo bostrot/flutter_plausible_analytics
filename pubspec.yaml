@@ -1,6 +1,6 @@
 name: plausible_analytics
-description: A Flutter plugin for Plausible Analytics.
-version: 0.1.3
+description: A Flutter plugin for Plausible Analytics. This uses the events API to send clickevents and goals to Plausible Analytics.
+version: 0.1.4
 homepage: https://github.com/bostrot/flutter_plausible_analytics.git
 issue_tracker: https://github.com/bostrot/flutter_plausible_analytics/issues
 
@@ -11,6 +11,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  universal_io: ^2.0.4
 
 dev_dependencies:
   flutter_test:

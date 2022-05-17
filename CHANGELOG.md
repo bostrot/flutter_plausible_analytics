@@ -1,3 +1,9 @@
+## 0.1.4
+
+* Enabled for flutter web
+* Added plausible event props
+* Added example
+
 ## 0.1.3
 
 * Added web check
