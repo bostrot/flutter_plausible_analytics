@@ -1,3 +1,7 @@
+## 0.2.1
+
+* Updated Readme, example and version bump
+
 ## 0.1.4
 
 * Enabled for flutter web
