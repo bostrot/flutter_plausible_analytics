@@ -23,6 +23,11 @@ Add a new site in plausible with your app name:
 
 ![Plausible Screenshot](https://github.com/bostrot/flutter_plausible_analytics/blob/main/plausible_screenshot.png?raw=true)
 
+### Android
+Using plausible on Android in release mode required internet permission in manifest
+
+```<uses-permission android:name="android.permission.INTERNET" />```
+
 
 ## Usage
 
