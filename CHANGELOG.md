@@ -1,3 +1,7 @@
+## 0.3.0
+
+* Added page navigation observer support
+
 ## 0.2.1
 
 * Updated Readme, example and version bump

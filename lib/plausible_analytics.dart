@@ -1,5 +1,6 @@
 library plausible_analytics;
 
+import 'package:flutter/foundation.dart';
 import 'package:universal_io/io.dart'; // instead of 'dart:io';
 import 'dart:convert';
 
@@ -63,8 +64,9 @@ class Plausible {
       client.close();
       return response.statusCode;
     } catch (e) {
-      // ignore: avoid_print
-      print(e);
+      if (kDebugMode) {
+        print(e);
+      }
     }
 
     return 1;

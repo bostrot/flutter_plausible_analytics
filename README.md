@@ -29,7 +29,7 @@ Using plausible on Android in release mode required internet permission in manif
 ```<uses-permission android:name="android.permission.INTERNET" />```
 
 
-## Usage
+## Basic Usage
 
 For a simple pageview:
 
@@ -70,3 +70,19 @@ You can also use a custom user agent but that is not recommended as
 the default one already puts in the current Operation System & Version.
 
 Also check [Plausible API docs Events API](https://plausible.io/docs/events-api) which this package uses.
+
+## Usage with Navigator
+
+```dart
+const String serverUrl = "https://plausible.io";
+const String domain = "yourapp.com";
+
+final plausible = Plausible(serverUrl, domain);
+
+MaterialApp(
+  navigatorObservers: [
+    PlausibleNavigatorObserver(plausible),
+  ],
+  home: HomeScreen(),
+);
+```
