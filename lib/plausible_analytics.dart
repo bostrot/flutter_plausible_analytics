@@ -44,8 +44,8 @@ class Plausible {
     }
 
     // Http Post request see https://plausible.io/docs/events-api
+    HttpClient client = HttpClient();
     try {
-      HttpClient client = HttpClient();
       HttpClientRequest request =
           await client.postUrl(Uri.parse(serverUrl + '/api/event'));
       request.headers.set('User-Agent', userAgent);
@@ -61,12 +61,13 @@ class Plausible {
       };
       request.write(json.encode(body));
       final HttpClientResponse response = await request.close();
-      client.close();
       return response.statusCode;
     } catch (e) {
       if (kDebugMode) {
         print(e);
       }
+    } finally {
+      client.close();
     }
 
     return 1;
