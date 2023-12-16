@@ -48,7 +48,10 @@ class Plausible {
     try {
       HttpClientRequest request =
           await client.postUrl(Uri.parse(serverUrl + '/api/event'));
-      request.headers.set('User-Agent', userAgent);
+      if (!kIsWeb) {
+        // browser adds by default this header so we should not overwrite it
+        request.headers.set('User-Agent', userAgent);
+      }
       request.headers.set('Content-Type', 'application/json; charset=utf-8');
       request.headers.set('X-Forwarded-For', '127.0.0.1');
       Object body = {
