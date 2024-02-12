@@ -53,7 +53,6 @@ class Plausible {
         request.headers.set('User-Agent', userAgent);
       }
       request.headers.set('Content-Type', 'application/json; charset=utf-8');
-      request.headers.set('X-Forwarded-For', '127.0.0.1');
       Object body = {
         "domain": domain,
         "name": name,
