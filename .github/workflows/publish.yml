@@ -1,0 +1,61 @@
+name: Publish to pub.dev
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+*'
+  # Lets a release be retried without moving the tag.
+  workflow_dispatch:
+
+jobs:
+  validate:
+    name: Analyze, test and dry run
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - name: Check the tag matches the pubspec version
+        if: github.ref_type == 'tag'
+        run: |
+          version=$(awk '/^version:/ { print $2; exit }' pubspec.yaml)
+          if [ "v$version" != "$GITHUB_REF_NAME" ]; then
+            echo "Tag $GITHUB_REF_NAME does not match pubspec version $version" >&2
+            exit 1
+          fi
+      - run: dart pub get
+      - run: dart analyze
+      - run: flutter test
+      - run: dart pub publish --dry-run
+
+  publish:
+    name: Publish
+    needs: validate
+    runs-on: ubuntu-latest
+    permissions:
+      # Naming a permission drops every other one, so checkout needs its own.
+      contents: read
+      # Lets setup-dart request the OIDC token used when PUB_CREDENTIALS is unset.
+      id-token: write
+    env:
+      PUB_CREDENTIALS: ${{ secrets.PUB_CREDENTIALS }}
+    steps:
+      - uses: actions/checkout@v4
+      # setup-dart provisions the pub.dev OIDC token; the Flutter SDK below
+      # shadows its dart binary but keeps that token.
+      - uses: dart-lang/setup-dart@v1
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      # pub prefers the OIDC token over the stored credentials, so drop it when
+      # a PUB_CREDENTIALS secret is configured.
+      - name: Authenticate with the PUB_CREDENTIALS secret
+        if: env.PUB_CREDENTIALS != ''
+        run: |
+          dart pub token remove https://pub.dev || true
+          config="${XDG_CONFIG_HOME:-$HOME/.config}/dart"
+          mkdir -p "$config"
+          printf '%s' "$PUB_CREDENTIALS" > "$config/pub-credentials.json"
+      - run: dart pub get
+      - run: dart pub publish --force

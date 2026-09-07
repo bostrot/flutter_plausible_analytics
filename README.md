@@ -142,3 +142,14 @@ accepted the event, `0` when `enabled` is `false` and `1` when the request
 could not be made.
 
 [Plausible Analytics Docs](https://plausible.io/docs)
+
+## Releasing
+
+Pushing a `v<version>` tag that matches the version in `pubspec.yaml` runs
+`.github/workflows/publish.yml`, which analyzes, tests and dry runs the package
+before publishing it to pub.dev.
+
+The workflow authenticates with the `PUB_CREDENTIALS` repository secret — the
+contents of the local `pub-credentials.json` written by `dart pub login`. When
+the secret is unset it falls back to the pub.dev OIDC token, which needs
+automated publishing to be configured for the package on pub.dev.
