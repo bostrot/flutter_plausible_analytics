@@ -86,3 +86,5 @@ MaterialApp(
   home: HomeScreen(),
 );
 ```
+
+[Plausible Analytics Docs](https://plausible.io/docs)
