@@ -1,4 +1,4 @@
-## 0.4.0
+## 0.4.1
 
 * Requires Flutter 3.32 / Dart 3.8 and updated `universal_io` and `flutter_lints`
 * Added revenue tracking via the new `PlausibleRevenue` parameter of `event()`
