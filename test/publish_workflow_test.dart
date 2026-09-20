@@ -56,6 +56,23 @@ int indexOfStep(YamlMap job, String needle) => stepsOf(job).indexWhere(
       '${step['uses'] ?? ''}'.contains(needle),
 );
 
+/// Runs the awk program the release job uses to pull one version's section out
+/// of `CHANGELOG.md`.
+String changelogSection(String version, String changelogPath) {
+  final result = Process.runSync('awk', [
+    '-v',
+    'heading=## $version',
+    r'''
+      $0 == heading { inside = 1; next }
+      inside && /^## / { exit }
+      inside { print }
+    ''',
+    changelogPath,
+  ]);
+  expect(result.exitCode, 0, reason: '${result.stderr}');
+  return (result.stdout as String).trim();
+}
+
 void main() {
   final workflow =
       loadYaml(File('.github/workflows/publish.yml').readAsStringSync())
@@ -176,5 +193,42 @@ void main() {
     );
     expect(check['if'], isNull, reason: 'a retried release has no tag to check');
     expect('${check['run']}', contains('exit 1'));
+  });
+  group('the GitHub release', () {
+    final release = workflow['jobs']['release'] as YamlMap;
+
+    test('waits for the publish job and only runs on a tag', () {
+      expect(release['needs'], 'publish');
+      expect(release['if'], "github.ref_type == 'tag'");
+    });
+
+    test('is the only job allowed to write to the repository', () {
+      expect((release['permissions'] as YamlMap)['contents'], 'write');
+      final publish = workflow['jobs']['publish'] as YamlMap;
+      expect((publish['permissions'] as YamlMap)['contents'], 'read');
+    });
+
+    test('takes its notes from the changelog entry for this version', () {
+      final section = changelogSection('${pubspec['version']}', 'CHANGELOG.md');
+      expect(section, isNotEmpty);
+      expect(section, isNot(contains('## ')));
+    });
+
+    test('stops at the previous entry, and is empty for a missing one', () {
+      final directory = Directory.systemTemp.createTempSync('changelog');
+      addTearDown(() => directory.deleteSync(recursive: true));
+      final path = '${directory.path}/CHANGELOG.md';
+      File(path).writeAsStringSync(
+        '## 2.0.0\n'
+        '\n'
+        '* the new one\n'
+        '\n'
+        '## 1.0.0\n'
+        '\n'
+        '* the old one\n',
+      );
+      expect(changelogSection('2.0.0', path), '* the new one');
+      expect(changelogSection('9.9.9', path), isEmpty);
+    });
   });
 }

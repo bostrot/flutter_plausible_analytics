@@ -93,3 +93,43 @@ jobs:
       - name: Undo the rewrites the SDK made
         run: git checkout -- .
       - run: dart pub publish --force
+
+  release:
+    name: GitHub release
+    needs: publish
+    # A retry from a branch has no tag to hang a release off.
+    if: github.ref_type == 'tag'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # The compare link needs the tag that came before this one.
+          fetch-depth: 0
+      - name: Write the notes from the changelog
+        run: |
+          version=$(awk '/^version:/ { print $2; exit }' pubspec.yaml)
+          awk -v heading="## $version" '
+            $0 == heading { inside = 1; next }
+            inside && /^## / { exit }
+            inside { print }
+          ' CHANGELOG.md > notes.md
+          previous=$(git describe --tags --abbrev=0 "$GITHUB_REF_NAME^" || true)
+          if [ -n "$previous" ]; then
+            printf '\n**Full Changelog**: %s/%s/compare/%s...%s\n' \
+              "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" "$previous" \
+              "$GITHUB_REF_NAME" >> notes.md
+          fi
+      - name: Create the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Releasing twice happens whenever a run is retried, so update the
+          # release that is already there instead of failing on it.
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            gh release edit "$GITHUB_REF_NAME" --notes-file notes.md
+          else
+            gh release create "$GITHUB_REF_NAME" \
+              --title "$GITHUB_REF_NAME" --notes-file notes.md
+          fi
