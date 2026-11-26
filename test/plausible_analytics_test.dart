@@ -41,7 +41,34 @@ void main() {
 
     expect(request.header('user-agent'), startsWith('Mozilla/5.0 ('));
     expect(request.header('content-type'), 'application/json; charset=utf-8');
-    expect(request.header('x-forwarded-for'), '127.0.0.1');
+    // The server reads the country from the address the request came from.
+    expect(request.header('x-forwarded-for'), isNull);
+  });
+
+  test('send a configured forwarded for address', () async {
+    final plausible = Plausible(server.url, domain, forwardedFor: '127.0.0.1');
+
+    expect(await plausible.event(), 202);
+
+    expect(server.requests.single.header('x-forwarded-for'), '127.0.0.1');
+  });
+
+  test('send only headers a browser allows on the web', () {
+    final plausible = Plausible(
+      server.url,
+      domain,
+      userAgent: 'MyApp/1.0 (Linux)',
+      forwardedFor: '127.0.0.1',
+    );
+
+    expect(plausible.requestHeaders(web: true), {
+      'Content-Type': 'application/json; charset=utf-8',
+    });
+    expect(plausible.requestHeaders(web: false), {
+      'Content-Type': 'application/json; charset=utf-8',
+      'User-Agent': 'MyApp/1.0 (Linux)',
+      'X-Forwarded-For': '127.0.0.1',
+    });
   });
 
   test('make plausible event call with custom event', () async {
