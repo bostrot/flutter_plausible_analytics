@@ -1,3 +1,11 @@
+## 0.5.0
+
+* Events can be sent from Flutter web: the user agent and `X-Forwarded-For`
+  headers are no longer set there, so the browser's CORS preflight passes
+* `X-Forwarded-For` is no longer fixed to `127.0.0.1`, so Plausible can report
+  the country of a visitor again. Set the new `forwardedFor` parameter to keep
+  sending a fixed address
+
 ## 0.4.1
 
 * Requires Flutter 3.32 / Dart 3.8 and updated `universal_io` and `flutter_lints`

@@ -54,6 +54,7 @@ class Plausible {
     this.domain, {
     this.userAgent = "",
     this.screenWidth = "",
+    this.forwardedFor = "",
   });
 
   /// The origin every app internal page and referrer is reported under.
@@ -72,6 +73,12 @@ class Plausible {
   /// The screen width reported with every event, e.g. `1920`. Left out of the
   /// request when empty.
   String screenWidth;
+
+  /// An IP address sent as `X-Forwarded-For`, e.g. to report every event from
+  /// one fixed address. Left out of the request when empty, which lets the
+  /// Plausible server read the country from the address the request came
+  /// from. Never sent from the web, where a browser would refuse the request.
+  String forwardedFor;
 
   /// Set to `false` to stop sending any event, e.g. when a user opts out.
   bool enabled = true;
@@ -135,9 +142,7 @@ class Plausible {
         final HttpClientRequest request = await client.postUrl(
           Uri.parse('$baseUrl/api/event'),
         );
-        request.headers.set('User-Agent', _resolvedUserAgent());
-        request.headers.set('Content-Type', 'application/json; charset=utf-8');
-        request.headers.set('X-Forwarded-For', '127.0.0.1');
+        requestHeaders().forEach(request.headers.set);
         request.write(json.encode(body));
         final HttpClientResponse response = await request.close();
         await response.drain<void>();
@@ -152,6 +157,20 @@ class Plausible {
     }
 
     return 1;
+  }
+
+  /// The headers sent with every event.
+  ///
+  /// A browser sends its own user agent and answers a header the Plausible
+  /// server does not allow across origins, such as `X-Forwarded-For`, with a
+  /// failed preflight, so on the [web] only the content type is set.
+  @visibleForTesting
+  Map<String, String> requestHeaders({bool web = kIsWeb}) {
+    return <String, String>{
+      'Content-Type': 'application/json; charset=utf-8',
+      if (!web) 'User-Agent': _resolvedUserAgent(),
+      if (!web && forwardedFor.isNotEmpty) 'X-Forwarded-For': forwardedFor,
+    };
   }
 
   /// [serverUrl] without any trailing slashes and surrounding whitespace.
